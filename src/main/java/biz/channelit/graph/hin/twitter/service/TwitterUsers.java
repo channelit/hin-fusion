@@ -7,7 +7,11 @@ import twitter4j.Twitter;
 import twitter4j.TwitterException;
 import twitter4j.User;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.stream.Stream;
 
 @Service
 public class TwitterUsers {
@@ -15,21 +19,26 @@ public class TwitterUsers {
     @Autowired
     Twitter twitter;
 
+    private static final String path = "../twitter_followers/";
+
     private static long cursor = -1L;
 
-    public void getFollowers() throws TwitterException {
+    public void getFollowers() throws TwitterException, IOException {
+        Stream<String> users = Files.lines(Paths.get("src/main/resources/twitter_journalists.txt"));
 
-        PagableResponseList<User> followersList;
-
-        ArrayList<String> list = new ArrayList<String>();
-        followersList = twitter.getFollowersList("hhpatel", cursor);
-
-        for (int i = 0; i < followersList.size(); i++) {
-            User user = followersList.get(i);
-            String name = user.getName();
-            list.add(name);
-            System.out.println("Name" + i + ":" + name);
-        }
+        users.forEach( user -> {
+                    try {
+                        PagableResponseList<User> followersList;
+                        followersList = twitter.getFollowersList("hhpatel", cursor);
+                        for (int i = 0; i < followersList.size(); i++) {
+                            User follower = followersList.get(i);
+                            String name = follower.getName();
+                            System.out.println("Name" + i + ":" + follower.getName());
+                        }
+                    } catch (TwitterException e) {
+                        e.printStackTrace();
+                    }
+        });
 
 
     }

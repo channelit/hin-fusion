@@ -7,6 +7,7 @@ import org.springframework.stereotype.Component;
 import twitter4j.TwitterException;
 
 import javax.annotation.PostConstruct;
+import java.io.IOException;
 
 @Component
 public class Startup {
@@ -22,7 +23,7 @@ public class Startup {
 //        tweets.getTweets();
         try {
             twitterUsers.getFollowers();
-        } catch (TwitterException e) {
+        } catch (TwitterException | IOException e) {
             e.printStackTrace();
         }
     }
