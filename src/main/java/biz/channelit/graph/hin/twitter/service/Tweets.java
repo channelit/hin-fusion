@@ -13,8 +13,10 @@ import com.twitter.hbc.core.endpoint.StatusesFilterEndpoint;
 import com.twitter.hbc.core.processor.StringDelimitedProcessor;
 import com.twitter.hbc.httpclient.auth.Authentication;
 import com.twitter.hbc.httpclient.auth.OAuth1;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.PostConstruct;
 import java.io.IOException;
 import java.nio.file.*;
 import java.text.SimpleDateFormat;
@@ -27,19 +29,22 @@ import java.util.regex.Pattern;
 @Service
 public class Tweets {
 
-    private static Client hosebirdClient;
+    @Autowired
+    Client hosebirdClient;
+
+    @Autowired
+    BlockingQueue<String> msgQueue;
 
     private static Set<String> fields = new HashSet<>(Arrays.asList("name", "text", "coordinates", "geo", "place", "name","screen_name", "followers_count", "friends_count", "favourites_count", "following", "lang", "user_mentions", "hashtags", "media", "media_url"));
 
     /**
      * Set up your blocking queues: Be sure to size these properly based on expected TPS of your stream
      */
-    private static BlockingQueue<String> msgQueue = new LinkedBlockingQueue<String>(1000);
 
     private static JsonParser parser = new JsonParser();
     private static final String del = "|";
     private static final String textFilter = "[^a-zA-Z0-9 +-.#:/@]";
-    private static final String path = "../";
+    private static final String path = "../tweets/";
 
     private void writeToFile(String str) {
         Path filePath = Paths.get(path + getFileName());
@@ -57,7 +62,7 @@ public class Tweets {
     }
 
     public void getTweets() {
-        setupHosebirdClient();
+//        setupHosebirdClient();
         hosebirdClient.connect();
 
         while (!hosebirdClient.isDone()) {
@@ -124,29 +129,29 @@ public class Tweets {
         return result;
     }
 
-    private static void setupHosebirdClient() {
-        /** Declare the host you want to connect to, the endpoint, and authentication (basic auth or oauth) */
-        Hosts hosebirdHosts = new HttpHosts(Constants.STREAM_HOST);
-        StatusesFilterEndpoint endpoint = new StatusesFilterEndpoint();
-
-        // Optional: set up some followings and track terms
-        //List<Long> followings = Lists.newArrayList(1234L, 566788L);
-        List<String> terms = Lists.newArrayList("orlando", "mgm", "vegas", "shooting", "nfl", "gun", "concert", "dead", "nevada", "mandalay");
-//            endpoint.followings(followings);
-        endpoint.trackTerms(terms);
-
-        Authentication hosebirdAuth = new OAuth1(
-                "o5mxswbDptDXSj9cr5swmZYle",
-                "ZryB6aSxlPcYoamhxhPyRoCCDCJDFPrZGp1s5pCQqo2xbsPorZ",
-                "36754386-dUYaCAWfwkoegk9GekTvIaXo1E1zeY6Xer5HvYiEY",
-                "4oNyXC5X3idupExP4BpkxmHKN1tkOUkAk9CQ1qM2TasRB");
-        ClientBuilder builder = new ClientBuilder()
-                .name("Hosebird-Client-01")        // optional: mainly for the logs
-                .hosts(hosebirdHosts)
-                .authentication(hosebirdAuth)
-                .endpoint(endpoint)
-                .processor(new StringDelimitedProcessor(msgQueue));
-
-        hosebirdClient = builder.build();
-    }
+//    private static void setupHosebirdClient() {
+//        /** Declare the host you want to connect to, the endpoint, and authentication (basic auth or oauth) */
+//        Hosts hosebirdHosts = new HttpHosts(Constants.STREAM_HOST);
+//        StatusesFilterEndpoint endpoint = new StatusesFilterEndpoint();
+//
+//        // Optional: set up some followings and track terms
+//        //List<Long> followings = Lists.newArrayList(1234L, 566788L);
+//        List<String> terms = Lists.newArrayList("orlando", "mgm", "vegas", "shooting", "nfl", "gun", "concert", "dead", "nevada", "mandalay");
+////            endpoint.followings(followings);
+//        endpoint.trackTerms(terms);
+//
+//        Authentication hosebirdAuth = new OAuth1(
+//                "o5mxswbDptDXSj9cr5swmZYle",
+//                "ZryB6aSxlPcYoamhxhPyRoCCDCJDFPrZGp1s5pCQqo2xbsPorZ",
+//                "36754386-dUYaCAWfwkoegk9GekTvIaXo1E1zeY6Xer5HvYiEY",
+//                "4oNyXC5X3idupExP4BpkxmHKN1tkOUkAk9CQ1qM2TasRB");
+//        ClientBuilder builder = new ClientBuilder()
+//                .name("Hosebird-Client-01")        // optional: mainly for the logs
+//                .hosts(hosebirdHosts)
+//                .authentication(hosebirdAuth)
+//                .endpoint(endpoint)
+//                .processor(new StringDelimitedProcessor(msgQueue));
+//
+//        hosebirdClient = builder.build();
+//    }
 }
