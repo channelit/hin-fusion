@@ -1,5 +1,6 @@
 package biz.channelit.graph.hin.twitter;
 
+import biz.channelit.graph.hin.google.NearbyFromGoogle;
 import biz.channelit.graph.hin.twitter.service.Tweets;
 import biz.channelit.graph.hin.twitter.service.TwitterUsers;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,11 +22,12 @@ public class Startup {
     @PostConstruct
     public void init() {
 //        tweets.getTweets();
-        try {
-            twitterUsers.getFollowers();
-        } catch (TwitterException | IOException e) {
-            e.printStackTrace();
-        }
+//        try {
+//            twitterUsers.getFollowers();
+//        } catch (TwitterException | IOException e) {
+//            e.printStackTrace();
+//        }
+        NearbyFromGoogle.findLocations();
     }
 
 

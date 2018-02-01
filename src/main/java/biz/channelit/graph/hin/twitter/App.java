@@ -12,10 +12,12 @@ import com.twitter.hbc.core.processor.StringDelimitedProcessor;
 import com.twitter.hbc.httpclient.auth.Authentication;
 import com.twitter.hbc.httpclient.auth.OAuth1;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.PropertySource;
 import twitter4j.Twitter;
 import twitter4j.TwitterException;
 import twitter4j.TwitterFactory;
@@ -28,18 +30,23 @@ import java.util.concurrent.LinkedBlockingQueue;
 
 @EnableAutoConfiguration
 @ComponentScan({"biz.channelit.graph.hin.twitter"})
+@PropertySource({"application.properties", "private.properties"})
 public class App {
 
-    private static final String hbToken = "36754386-dUYaCAWfwkoegk9GekTvIaXo1E1zeY6Xer5HvYiEY";
-    private static final String hbTokenSecret = "4oNyXC5X3idupExP4BpkxmHKN1tkOUkAk9CQ1qM2TasRB";
-    private static final String hbConsumerKey = "o5mxswbDptDXSj9cr5swmZYle";
-    private static final String hbConsumerSecret = "ZryB6aSxlPcYoamhxhPyRoCCDCJDFPrZGp1s5pCQqo2xbsPorZ";
+    @Value("${twitter.token}")
+    private String hbToken;
+
+    @Value("${twitter.token.secret}")
+    private String hbTokenSecret;
+
+    @Value("${twitter.consumer.key}")
+    private String hbConsumerKey;
+
+    @Value("${twitter.consumer.secret}")
+    private String hbConsumerSecret;
+
     public static BlockingQueue<String> msgQueue = new LinkedBlockingQueue<String>(1000);
 
-    private static final String fsToken = "36754386-dUYaCAWfwkoegk9GekTvIaXo1E1zeY6Xer5HvYiEY";
-    private static final String fsTokenSecret = "4oNyXC5X3idupExP4BpkxmHKN1tkOUkAk9CQ1qM2TasRB";
-    private static final String fsConsumerKey = "o5mxswbDptDXSj9cr5swmZYle";
-    private static final String fsConsumerSecret = "ZryB6aSxlPcYoamhxhPyRoCCDCJDFPrZGp1s5pCQqo2xbsPorZ";
 
     @Bean
     public Twitter getTwitter() throws IOException, TwitterException {
