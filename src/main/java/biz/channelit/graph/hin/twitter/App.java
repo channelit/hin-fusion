@@ -30,24 +30,29 @@ import java.util.concurrent.LinkedBlockingQueue;
 @ComponentScan({"biz.channelit.graph.hin.twitter"})
 public class App {
 
-    private static final String token = "36754386-dUYaCAWfwkoegk9GekTvIaXo1E1zeY6Xer5HvYiEY";
-    private static final String tokenSecret = "4oNyXC5X3idupExP4BpkxmHKN1tkOUkAk9CQ1qM2TasRB";
-    private static final String consumerKey = "o5mxswbDptDXSj9cr5swmZYle";
-    private static final String consumerSecret = "ZryB6aSxlPcYoamhxhPyRoCCDCJDFPrZGp1s5pCQqo2xbsPorZ";
+    private static final String hbToken = "36754386-dUYaCAWfwkoegk9GekTvIaXo1E1zeY6Xer5HvYiEY";
+    private static final String hbTokenSecret = "4oNyXC5X3idupExP4BpkxmHKN1tkOUkAk9CQ1qM2TasRB";
+    private static final String hbConsumerKey = "o5mxswbDptDXSj9cr5swmZYle";
+    private static final String hbConsumerSecret = "ZryB6aSxlPcYoamhxhPyRoCCDCJDFPrZGp1s5pCQqo2xbsPorZ";
     public static BlockingQueue<String> msgQueue = new LinkedBlockingQueue<String>(1000);
+
+    private static final String fsToken = "36754386-dUYaCAWfwkoegk9GekTvIaXo1E1zeY6Xer5HvYiEY";
+    private static final String fsTokenSecret = "4oNyXC5X3idupExP4BpkxmHKN1tkOUkAk9CQ1qM2TasRB";
+    private static final String fsConsumerKey = "o5mxswbDptDXSj9cr5swmZYle";
+    private static final String fsConsumerSecret = "ZryB6aSxlPcYoamhxhPyRoCCDCJDFPrZGp1s5pCQqo2xbsPorZ";
 
     @Bean
     public Twitter getTwitter() throws IOException, TwitterException {
         TwitterFactory factory = new TwitterFactory();
-        AccessToken accessToken = new AccessToken(token, tokenSecret);
+        AccessToken accessToken = new AccessToken(hbToken, hbTokenSecret);
         Twitter twitter = factory.getInstance();
-        twitter.setOAuthConsumer(consumerKey, consumerSecret);
+        twitter.setOAuthConsumer(hbConsumerKey, hbConsumerSecret);
         twitter.setOAuthAccessToken(accessToken);
         return twitter;
     }
 
-    @Bean
-    public Client getHBC() {
+    @Bean(name="hbClient")
+    public Client hbClient() {
         /** Declare the host you want to connect to, the endpoint, and authentication (basic auth or oauth) */
         Client hosebirdClient;
         Hosts hosebirdHosts = new HttpHosts(Constants.STREAM_HOST);
@@ -59,7 +64,7 @@ public class App {
 //            endpoint.followings(followings);
         endpoint.trackTerms(terms);
 
-        Authentication hosebirdAuth = new OAuth1(consumerKey, consumerSecret, token, tokenSecret);
+        Authentication hosebirdAuth = new OAuth1(hbConsumerKey, hbConsumerSecret, hbToken, hbTokenSecret);
         ClientBuilder builder = new ClientBuilder()
                 .name("Hosebird-Client-01")        // optional: mainly for the logs
                 .hosts(hosebirdHosts)
@@ -70,6 +75,14 @@ public class App {
         hosebirdClient = builder.build();
 
         return hosebirdClient;
+    }
+
+    @Bean(name="fsClient")
+    public Client fsClient() {
+        /** Declare the host you want to connect to, the endpoint, and authentication (basic auth or oauth) */
+
+
+        return null;
     }
 
     public static void main(String[] args) throws Exception {
